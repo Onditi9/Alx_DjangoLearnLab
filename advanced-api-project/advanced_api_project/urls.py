@@ -1,5 +1,5 @@
 from django.urls import path
-from . import (
+from .view import (
     BookListView,
     BookDetailView,
     BookCreateView,
