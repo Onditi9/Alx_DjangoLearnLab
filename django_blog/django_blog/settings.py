@@ -126,3 +126,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py (add / modify)
+LOGIN_REDIRECT_URL = "home"   # or 'profile' or whichever view name
+LOGOUT_REDIRECT_URL = "home"
+# Media (for profile images)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"   # if using Pathlib; or os.path.join(BASE_DIR, 'media')
+# In templates setting be sure 'django.contrib.messages.context_processors.messages' is included.

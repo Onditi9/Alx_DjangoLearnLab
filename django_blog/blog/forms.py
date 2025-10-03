@@ -1,19 +1,28 @@
 from django import forms
-from .models import Post
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from .models import Profile
+
+# Registration form (extends Django's built-in UserCreationForm)
+class UserRegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True, help_text="Required. Enter a valid email address.")
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password1", "password2"]
 
 
-class PostForm(forms.ModelForm):
-class Meta:
-model = Post
-fields = ['title', 'content']
-widgets = {
-'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Post title'}),
-'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10, 'placeholder': 'Write your post here...'}),
-}
+# Form for updating built-in User model (username & email)
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "email"]
 
 
-def clean_title(self):
-title = self.cleaned_data.get('title', '')
-if len(title.strip()) == 0:
-raise forms.ValidationError('Title cannot be empty.')
-return title
+# Form for updating Profile model (bio & profile picture)
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["bio", "profile_image"]
