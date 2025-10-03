@@ -134,3 +134,9 @@ LOGOUT_REDIRECT_URL = "home"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"   # if using Pathlib; or os.path.join(BASE_DIR, 'media')
 # In templates setting be sure 'django.contrib.messages.context_processors.messages' is included.
+
+# settings.py
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",   # project-level static directory
+]
