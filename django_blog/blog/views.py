@@ -10,6 +10,13 @@ class PostListView(ListView):
     context_object_name = "posts"
     paginate_by = 10  # optional
 
+    def get_queryset(self):
+        qs = Post.objects.order_by('-created_at')
+        if self.request.user.is_authenticated:
+            # Authors can see their own unpublished posts
+            return qs.filter(models.Q(published=True) | models.Q(author=self.request.user))
+        return qs.filter(published=True)
+
 class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
@@ -45,43 +52,5 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return self.request.user == post.author
 
-# blog/views.py
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import views as auth_views
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
-
-def register(request):
-    if request.method == "POST":
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            messages.success(request, f"Account created for {user.username}! You can now log in.")
-            return redirect("login")
-        else:
-            messages.error(request, "Please correct the errors below.")
-    else:
-        form = UserRegisterForm()
-    return render(request, "blog/register.html", {"form": form})
-
-@login_required
-def profile(request):
-    if request.method == "POST":
-        u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
-        if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
-            p_form.save()
-            messages.success(request, "Your profile has been updated.")
-            return redirect("profile")  # PRG pattern
-        else:
-            messages.error(request, "Please correct the errors below.")
-    else:
-        u_form = UserUpdateForm(instance=request.user)
-        p_form = ProfileUpdateForm(instance=request.user.profile)
-
-    context = {"u_form": u_form, "p_form": p_form}
-    return render(request, "blog/profile.html", context)
 
                                                                                                                                                                                                             
