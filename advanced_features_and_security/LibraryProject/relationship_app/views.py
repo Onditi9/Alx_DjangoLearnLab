@@ -8,6 +8,7 @@ from .models import Book, Library
 
 
 
+
 # Existing Views
 
 # Function-based view to list all books
@@ -119,3 +120,13 @@ def delete_book(request, book_id):
         book.delete()
         return redirect("list_books")
     return render(request, "relationship_app/delete_book.html", {"book": book})
+
+from django.shortcuts import render
+from django.views.generic import DetailView  # ✅ Import Django's class-based DetailView
+from .models import Library  # ✅ Import your Library model
+
+# Class-Based View: Display details of a specific library
+class LibraryDetailView(DetailView):
+    model = Library  # ✅ Tell Django this view is based on the Library model
+    template_name = 'relationship_app/library_detail.html'  # ✅ HTML file to render
+    context_object_name = 'library'  # ✅ What the template will call this object
