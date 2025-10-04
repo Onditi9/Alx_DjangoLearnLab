@@ -22,3 +22,10 @@ urlpatterns = [
     path("edit_book/<int:book_id>/", views.edit_book, name="edit_book"),  
     path("delete_book/<int:book_id>/", views.delete_book, name="delete_book"),
 ]
+
+from django.urls import path
+from .views import LibraryDetailView  # ✅ Import the view
+
+urlpatterns = [
+    path('library/<int:pk>/', LibraryDetailView.as_view(), name='library_detail'),
+]
