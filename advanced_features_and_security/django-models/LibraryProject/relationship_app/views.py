@@ -119,3 +119,14 @@ def delete_book(request, book_id):
         book.delete()
         return redirect("list_books")
     return render(request, "relationship_app/delete_book.html", {"book": book})
+
+# relationship_app/views.py
+
+from django.shortcuts import render
+from .models import Book, Library
+from django.views.generic import DetailView
+
+# Function-based view: list all books
+def list_books(request):
+    books = Book.objects.all()
+    return render(request, 'relationship_app/list_books.html', {'books': books})
