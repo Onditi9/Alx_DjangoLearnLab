@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -138,5 +139,10 @@ MEDIA_ROOT = BASE_DIR / "media"   # if using Pathlib; or os.path.join(BASE_DIR, 
 # settings.py
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [
-    BASE_DIR / "static",   # project-level static directory
+    BASE_DIR / "static",
+  # project-level static directory
 ]
+
+LOGIN_REDIRECT_URL = 'blog-home'
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
