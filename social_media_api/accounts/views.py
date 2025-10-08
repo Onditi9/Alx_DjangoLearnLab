@@ -1,24 +1,24 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import CustomUser
+from .models import User  # or CustomUser if you renamed it
+from .serializers import UserSerializer  # optional, for response
 
 class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
 
-    def post(self, request, *args, **kwargs):
-        user_to_follow = get_object_or_404(CustomUser, id=self.kwargs['pk'])
-        request.user.follow(user_to_follow)
-        return Response({"message": f"You are now following {user_to_follow.username}"}, status=status.HTTP_200_OK)
+    def post(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        request.user.follow(target_user)
+        return Response({'message': f'You followed {target_user.username}'}, status=status.HTTP_200_OK)
 
 
 class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
 
-    def post(self, request, *args, **kwargs):
-        user_to_unfollow = get_object_or_404(CustomUser, id=self.kwargs['pk'])
-        request.user.unfollow(user_to_unfollow)
-        return Response({"message": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
-
+    def post(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        request.user.unfollow(target_user)
+        return Response({'message': f'You unfollowed {target_user.username}'}, status=status.HTTP_200_OK)
