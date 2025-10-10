@@ -58,3 +58,66 @@ from .serializers import PostSerializer  # Create a serializer too
 class PostListView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from .models import Post
+from .serializers import PostSerializer
+
+class FeedView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        following_users = user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from django.shortcuts import get_object_or_404
+from .models import Post, Like
+from .serializers import LikeSerializer
+from notifications.utils import create_notification  # helper we'll make
+
+class LikePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        user = request.user
+        # Prevent liking own post? often allowed — leaving allowed.
+        like, created = Like.objects.get_or_create(post=post, user=user)
+        if not created:
+            return Response({'detail': 'Already liked'}, status=status.HTTP_400_BAD_REQUEST)
+        # create notification for post author if liker != author
+        if post.author != user:
+            create_notification(recipient=post.author, actor=user, verb='liked', target=post)
+        serializer = LikeSerializer(like)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class UnlikePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        user = request.user
+        deleted, _ = Like.objects.filter(post=post, user=user).delete()
+        if deleted:
+            return Response({'detail': 'Unliked'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'You had not liked this post'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# optional: endpoint to list likes on a post
+from rest_framework.generics import ListAPIView
+from .serializers import LikeSerializer
+
+class PostLikesListView(ListAPIView):
+    serializer_class = LikeSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        post_id = self.kwargs.get('pk')
+        return Like.objects.filter(post__id=post_id).select_related('user')
