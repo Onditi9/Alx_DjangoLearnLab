@@ -2,6 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # You can add your post and comment routes here later
+    path('', views.PostListView.as_view(), name='post-list'),  # Example
 ]
-
