@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'social_media_api.urls'
@@ -143,4 +145,14 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'accounts.User'
 
-INSTALLED_APPS += ['notifications', 'django.contrib.contenttypes']
+
+import dj_database_url
+
+DEBUG = False
+ALLOWED_HOSTS = ['*']  # Later replace with Railway domain
+
+DATABASES = {
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+}
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
