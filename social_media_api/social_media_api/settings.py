@@ -10,6 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
+from pathlib import Path
+
+# Railway / Render: Get PORT from environment
+PORT = os.getenv("PORT", "8000")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 from pathlib import Path
 
