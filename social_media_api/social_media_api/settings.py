@@ -168,3 +168,38 @@ X_FRAME_OPTIONS = 'DENY'   # or 'SAMEORIGIN'
 
 # Redirect all traffic to HTTPS
 SECURE_SSL_REDIRECT = True
+
+import dj_database_url
+from decouple import config  # if you are using python-decouple (optional)
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', ''),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
+
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
+
+# settings.py
+
+DEBUG = False
+
+ALLOWED_HOSTS = ['*']  # or your Railway URL
+
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
