@@ -156,3 +156,15 @@ DATABASES = {
 }
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Security settings for production
+
+# Prevent XSS attacks
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Clickjacking protection
+X_FRAME_OPTIONS = 'DENY'   # or 'SAMEORIGIN'
+
+# Redirect all traffic to HTTPS
+SECURE_SSL_REDIRECT = True
