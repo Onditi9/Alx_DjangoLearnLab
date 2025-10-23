@@ -1,26 +1,22 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from bookshelf.models import Book
-
-# Get content type for Book model
-content_type = ContentType.objects.get_for_model(Book)
-
-# Fetch permissions
-view_perm = Permission.objects.get(codename="can_view", content_type=content_type)
-create_perm = Permission.objects.get(codename="can_create", content_type=content_type)
-edit_perm = Permission.objects.get(codename="can_edit", content_type=content_type)
-delete_perm = Permission.objects.get(codename="can_delete", content_type=content_type)
-
-# Create groups
-viewers, _ = Group.objects.get_or_create(name="Viewers")
-editors, _ = Group.objects.get_or_create(name="Editors")
-admins, _ = Group.objects.get_or_create(name="Admins")
-
-# Assign permissions
-viewers.permissions.add(view_perm)
-
-editors.permissions.add(view_perm, create_perm, edit_perm)
-
-admins.permissions.add(view_perm, create_perm, edit_perm, delete_perm)
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
 
 
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,69 +1,52 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings  # ✅ Correct User model reference
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 class Author(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
 
-    def _str_(self):
+    def __str__(self):
         return self.name
 
-
 class Book(models.Model):
-    title = models.CharField(max_length=200)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="books")
-
-    def _str_(self):
-        return self.title
+    title = models.CharField(max_length=255)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    published_date = models.DateField(null=True, blank=True)
 
     class Meta:
         permissions = [
-            ("can_add_book", "Can add a new book"),
-            ("can_change_book", "Can edit a book"),
-            ("can_delete_book", "Can delete a book"),
+            ("can_add_book", "Can add book"),
+            ("can_change_book", "Can change book"),
+            ("can_delete_book", "Can delete book"),
         ]
 
+    def __str__(self):
+        return self.title
 
 class Library(models.Model):
-    name = models.CharField(max_length=100)
-    books = models.ManyToManyField(Book, related_name="libraries")
-
-    def _str_(self):
-        return self.name
-
+    name = models.CharField(max_length=255)
+    books = models.ManyToManyField(Book)
 
 class Librarian(models.Model):
-    name = models.CharField(max_length=100)
-    library = models.OneToOneField(Library, on_delete=models.CASCADE, related_name="librarian")
+    name = models.CharField(max_length=255)
+    library = models.OneToOneField(Library, on_delete=models.CASCADE)
 
-    def _str_(self):
-        return f"{self.name} ({self.library.name})"
-
-
-# New UserProfile for Roles
 class UserProfile(models.Model):
-    ROLE_CHOICES = [
+    USER_CHOICES = [
         ('Admin', 'Admin'),
         ('Librarian', 'Librarian'),
         ('Member', 'Member'),
     ]
+    
+    # ✅ Fixed: Correct User reference
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='relationship_profile')
+    
+    # ✅ Fixed: Set a valid default value from USER_CHOICES
+    role = models.CharField(max_length=15, choices=USER_CHOICES, default='Member')
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='Member')
-
-    def _str_(self):
-        return f"{self.user.username} - {self.role}"
-
-
-# Signals to auto-create profile
-@receiver(post_save, sender=User)
+# ✅ Fixed signal function
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'userprofile'):
-        instance.userprofile.save()
